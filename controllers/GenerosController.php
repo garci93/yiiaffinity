@@ -55,7 +55,19 @@ class GenerosController extends \yii\web\Controller
 
     public function actionDelete($id)
     {
-        Yii::$app->db->createCommand()->delete('generos', ['id' => $id])->execute();
+        $count = Yii::$app->db
+            ->createCommand('SELECT count(*)
+                               FROM peliculas
+                              WHERE genero_id = :id', ['id' => $id])
+            ->queryScalar();
+        if ($count != 0) {
+            Yii::$app->session->setFlash('error', 'Hay películas de ese género.');
+        } else {
+            Yii::$app->db->createCommand()
+            ->delete('generos', ['id' => $id])
+            ->execute();
+            Yii::$app->session->setFlash('success', 'Género borrado correctamente.');
+        }
         return $this->redirect(['generos/index']);
     }
 
@@ -74,7 +86,8 @@ class GenerosController extends \yii\web\Controller
         $fila = Yii::$app->db
             ->createCommand('SELECT *
                                FROM generos
-                              WHERE id = :id', [':id' => $id])->queryOne();
+                              WHERE id = :id', [':id' => $id])
+            ->queryOne();
         if ($fila === false) {
             throw new NotFoundHttpException('Esa género no existe.');
         }

@@ -13,9 +13,10 @@ use yii\helpers\Html;
                     <td><?= Html::encode($fila['genero']) ?></td>
                     <td>
                         <?= Html::a('Modificar', ['generos/update', 'id' => $fila['id']], ['class' => 'btn-xs btn-info']) ?>
-                        <?= Html::a('Borrar', ['generos/delete', 'id' => $fila['id']], [
+                        <?= Html::a('Borrar', ['generos/delete', 'id' => $fila['id']],
+                        [
                             'class' => 'btn-xs btn-danger',
-                            'data-confirm' => '¿Seguro que desea borrar?',
+                            'data-confirm' => '¿Seguro que deseas borrar el género?',
                             'data-method' => 'POST',
                         ]) ?>
                     </td>
