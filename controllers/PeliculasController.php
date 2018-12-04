@@ -31,6 +31,7 @@ class PeliculasController extends \yii\web\Controller
             Yii::$app->db->createCommand()
                 ->insert('peliculas', $peliculasForm->attributes)
                 ->execute();
+            Yii::$app->session->setFlash('success', 'Fila insertada correctamente.');
             return $this->redirect(['peliculas/index']);
         }
         return $this->render('create', [
@@ -46,6 +47,7 @@ class PeliculasController extends \yii\web\Controller
             Yii::$app->db->createCommand()
                 ->update('peliculas', $peliculasForm->attributes, ['id' => $id])
                 ->execute();
+            Yii::$app->session->setFlash('success', 'Fila modificada correctamente.');
             return $this->redirect(['peliculas/index']);
         }
 
