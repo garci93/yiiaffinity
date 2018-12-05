@@ -17,7 +17,6 @@ class GenerosController extends Controller
         return [
             'verbs' => [
                 'class' => VerbFilter::className(),
-                'only' => ['delete'],
                 'actions' => [
                     'delete' => ['post'],
                 ],
@@ -35,6 +34,10 @@ class GenerosController extends Controller
         ];
     }
 
+    /**
+     * Listado de géneros.
+     * @return string La vista del listado de géneros
+     */
     public function actionIndex()
     {
         $count = \Yii::$app->db
@@ -78,6 +81,12 @@ class GenerosController extends Controller
         ]);
     }
 
+
+    /**
+     * Modifica un género.
+     * @param  int              $id El id del género a modificar
+     * @return string|Response      El formulario de modificación o una redirección
+     */
     public function actionUpdate($id)
     {
         $generosForm = new GenerosForm(['attributes' => $this->buscarGenero($id)]);
@@ -96,13 +105,18 @@ class GenerosController extends Controller
         ]);
     }
 
+    /**
+     * Borra un género.
+     * @param  int $id El id del género a borrar
+     * @return Response     Una redirección
+     */
     public function actionDelete($id)
     {
         $count = Yii::$app->db
-            ->createCommand('SELECT count(*)
-                               FROM peliculas
-                              WHERE genero_id = :id', ['id' => $id])
-            ->queryScalar();
+            ->createCommand('SELECT *
+                               FROM generos
+                              WHERE id = :id', ['id' => $id])
+            ->queryOne();
         if ($count != 0) {
             Yii::$app->session->setFlash('error', 'Hay películas de ese género.');
         } else {
@@ -124,6 +138,12 @@ class GenerosController extends Controller
         return $listaGeneros;
     }
 
+    /**
+     * Localiza un género por su id.
+     * @param  int                      $id El id del género
+     * @return array                        El género si existe
+     * @throws NotFoundHttpException        Si el género no existe
+     */
     private function buscarGenero($id)
     {
         $fila = Yii::$app->db

@@ -1,13 +1,15 @@
 <?php
 use yii\helpers\Html;
+$this->title = 'Listado de películas';
+$this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="row">
     <table class="table table-striped">
         <thead>
-            <th>Título</th>
-            <th>Año</th>
-            <th>Duración</th>
-            <th>Género</th>
+            <th><?= $sort->link('titulo') ?></th>
+            <th><?= $sort->link('anyo') ?></th>
+            <th><?= $sort->link('duracion') ?></th>
+            <th><?= $sort->link('genero') ?></th>
             <th>Acciones</th>
         </thead>
         <tbody>
@@ -15,6 +17,7 @@ use yii\helpers\Html;
                 <tr>
                     <td><?= Html::encode($fila['titulo']) ?></td>
                     <td><?= Html::encode($fila['anyo']) ?></td>
+                    <td><?= Html::encode($fila['sinopsis']) ?></td>
                     <td><?= Html::encode($fila['duracion']) ?></td>
                     <td><?= Html::encode($fila['genero']) ?></td>
                     <td>
