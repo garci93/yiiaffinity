@@ -10,9 +10,6 @@ use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 
-/**
- * Definición del controlador generos.
- */
 class GenerosController extends Controller
 {
     public function behaviors()
