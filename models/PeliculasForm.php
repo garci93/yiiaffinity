@@ -17,6 +17,7 @@ class PeliculasForm extends Model
         return [
             [['titulo', 'genero_id'], 'required'],
             [['anyo', 'duracion', 'genero_id'], 'number'],
+            [['anyo','duracion'], 'integer', 'min' => 0],
             [['titulo'], 'string', 'max' => 255],
             [['sinopsis'], 'trim'],
         ];
