@@ -6,22 +6,6 @@ CREATE TABLE generos
   , genero VARCHAR(255) NOT NULL UNIQUE
 );
 
-DROP TABLE IF EXISTS personas CASCADE;
-
-CREATE TABLE personas
-(
-    id     BIGSERIAL    PRIMARY KEY
-  , nombre VARCHAR(255) NOT NULL
-);
-
-DROP TABLE IF EXISTS papeles CASCADE;
-
-CREATE TABLE papeles
-(
-    id     BIGSERIAL    PRIMARY KEY
-  , papel  VARCHAR(255) NOT NULL UNIQUE
-);
-
 DROP TABLE IF EXISTS peliculas CASCADE;
 
 CREATE TABLE peliculas
@@ -39,16 +23,6 @@ CREATE TABLE peliculas
                            ON UPDATE CASCADE
 );
 
-DROP TABLE IF EXISTS participaciones CASCADE;
-
-CREATE TABLE participaciones
-(
-    pelicula_id BIGINT REFERENCES peliculas (id)
-  , persona_id  BIGINT REFERENCES personas (id)
-  , papel_id    BIGINT REFERENCES papeles (id)
-  , PRIMARY KEY (pelicula_id, persona_id, papel_id)
-);
-
 DROP TABLE IF EXISTS usuarios CASCADE;
 
 CREATE TABLE usuarios
@@ -58,6 +32,32 @@ CREATE TABLE usuarios
                          CONSTRAINT ck_login_sin_espacios
                          CHECK (login NOT LIKE '% %')
   , password VARCHAR(60) NOT NULL
+);
+
+DROP TABLE IF EXISTS personas CASCADE;
+
+CREATE TABLE personas
+(
+    id     BIGSERIAL    PRIMARY KEY
+  , nombre VARCHAR(255) NOT NULL
+);
+
+DROP TABLE IF EXISTS papeles CASCADE;
+
+CREATE TABLE papeles
+(
+    id    BIGSERIAL    PRIMARY KEY
+  , papel VARCHAR(255) NOT NULL UNIQUE
+);
+
+DROP TABLE IF EXISTS participaciones CASCADE;
+
+CREATE TABLE participaciones
+(
+    pelicula_id BIGINT REFERENCES peliculas (id)
+  , persona_id  BIGINT REFERENCES personas (id)
+  , papel_id    BIGINT REFERENCES papeles (id)
+  , PRIMARY KEY (pelicula_id, persona_id, papel_id)
 );
 
 -- INSERT
@@ -93,4 +93,4 @@ VALUES (1, 1, 1)
      , (1, 2, 3)
      , (2, 2, 1)
      , (2, 2, 2)
-     , (1, 1, 4);
+     , (2, 1, 4);
