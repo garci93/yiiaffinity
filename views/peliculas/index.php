@@ -1,61 +1,64 @@
 <?php
+use yii\grid\GridView;
+use yii\grid\DataColumn;
+use yii\grid\ActionColumn;
+use yii\grid\SerialColumn;
+use kartik\number\NumberControl;
 use yii\helpers\Html;
-use yii\widgets\ActiveForm;
+
+use yii\web\View;
+
 $this->title = 'Listado de películas';
 $this->params['breadcrumbs'][] = $this->title;
+$js = <<<EOF
+    $('#boton').click(function (ev) {
+        ev.preventDefault();
+        alert('hola');
+    });
+EOF;
+$this->registerJs($js);
 ?>
-<?php var_dump($sort->orders) ?>
-<?php $form = ActiveForm::begin() ?>
-    <?= $form->field($buscarForm, 'titulo') ?>
-    <?= $form->field($buscarForm, 'genero_id')->dropDownList($listaGeneros) ?>
-    <div class="form-group">
-        <?= Html::submitButton('Buscar', ['class' => 'btn btn-primary']) ?>
-    </div>
-<?php ActiveForm::end() ?>
-
 <h1>Listado de películas</h1>
-<table class="table table-striped">
-    <thead>
-        <th>#</th>
-        <th><?= $sort->link('titulo') ?></th>
-        <th><?= $sort->link('anyo') ?></th>
-        <th><?= $sort->link('duracion') ?></th>
-        <th><?= $sort->link('genero') ?></th>
-        <th>Acciones</th>
-    </thead>
-    <tbody>
-        <?php
-        $i = 1;
-        $total = 0;
-        ?>
-        <?php foreach ($peliculas as $pelicula): ?>
-            <tr>
-                <td><?= $i++ ?></td>
-                <td><?= Html::a(Html::encode($pelicula->titulo), ['peliculas/ver', 'id' => $pelicula->id]) ?></td>
-                <td><?= Html::encode($pelicula->anyo) ?></td>
-                <td><?= Html::encode($pelicula->duracion) ?></td>
-                <td><?= Html::encode($pelicula->genero->genero) ?></td>
-                <td>
-                    <?= Html::a('Modificar', ['peliculas/update', 'id' => $pelicula->id], ['class' => 'btn-xs btn-info']) ?>
-                    <?= Html::a('Borrar', ['peliculas/delete', 'id' => $pelicula->id], [
-                        'class' => 'btn-xs btn-danger',
-                        'data-confirm' => '¿Seguro que desea borrar?',
-                        'data-method' => 'POST',
-                    ]) ?>
-                </td>
-            </tr>
-            <?php $total += $pelicula->duracion ?>
-        <?php endforeach ?>
-        <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td><?= Html::encode($total) ?></td>
-        </tr>
-    </tbody>
-</table>
-<div class="row">
-    <div class="text-center">
-        <?= Html::a('Insertar película', ['peliculas/create'], ['class' => 'btn btn-info']) ?>
-    </div>
-</div>
+
+<button id="boton" type="button" name="button">Púlsame</button>
+
+<?= NumberControl::widget([
+    'name' => 'prueba',
+    'value' => 1200,
+    'maskedInputOptions' => [
+        'suffix' => ' €',
+        'groupSeparator' => '.',
+        'radixPoint' => ','
+    ],
+]) ?>
+
+<?= GridView::widget([
+    'dataProvider' => $dataProvider,
+    'filterModel' => $searchModel,
+    'columns' => [
+        'titulo',
+        'anyo',
+        'precio:currency',
+        [
+            'attribute' => 'duracion',
+            'value' => function ($model) {
+                return $model->duracion * 60;
+            },
+            'format' => 'duration',
+        ],
+        [
+            'attribute' => 'genero.genero',
+            'value' => function ($model) {
+                return Html::a(
+                    Html::encode($model->genero->genero),
+                    ['generos/ver', 'id' => $model->genero->id]
+                );
+            },
+            'format' => 'raw',
+        ],
+        [
+            'class' => ActionColumn::class,
+            'header' => 'Acciones',
+        ],
+    ],
+]) ?>

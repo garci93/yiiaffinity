@@ -2,55 +2,77 @@
 
 namespace app\controllers;
 
-use app\models\BuscarForm;
 use app\models\Generos;
 use app\models\Peliculas;
+use app\models\PeliculasSearch;
 use Yii;
-use yii\data\Sort;
+use yii\data\ActiveDataProvider;
+use yii\filters\AccessControl;
 use yii\helpers\ArrayHelper;
 use yii\web\NotFoundHttpException;
+use yii\web\Response;
+use yii\widgets\ActiveForm;
 
 /**
  * Definición del controlador peliculas.
  */
 class PeliculasController extends \yii\web\Controller
 {
+    public function behaviors()
+    {
+        return [
+            'access' => [
+                'class' => AccessControl::class,
+                'only' => ['index', 'view'],
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'actions' => ['index'],
+                        'roles' => ['@'],
+                        'matchCallback' => function ($rule, $action) {
+                            return Yii::$app->user->identity->login === 'admin';
+                        },
+                    ],
+                    [
+                        'allow' => true,
+                        'actions' => ['view'],
+                        'roles' => ['@'],
+                        'matchCallback' => function ($rule, $action) {
+                            return Yii::$app->request->get('id') == 1;
+                        },
+                    ],
+                ],
+            ],
+        ];
+    }
+
     public function actionPrueba()
     {
-        Yii::$app->session->setFlash('error', 'Esto es un error.');
-        return $this->redirect(['peliculas/index']);
+        $provider = new ActiveDataProvider([
+            'query' => Peliculas::find(),
+            'pagination' => [
+                'pageSize' => 2,
+            ],
+            'sort' => [
+                'attributes' => [
+                    'titulo',
+                    'anyo',
+                ],
+            ],
+        ]);
+        var_dump($provider->models);
+        var_dump($provider->count);
+        var_dump($provider->totalCount);
     }
 
     public function actionIndex()
     {
-        $sort = new Sort([
-            'attributes' => [
-                'titulo',
-                'anyo',
-                'duracion',
-                'genero',
-            ],
-        ]);
-
-        $buscarForm = new BuscarForm();
-        $query = Peliculas::find()->with('genero');
-
-        if ($buscarForm->load(Yii::$app->request->post()) && $buscarForm->validate()) {
-            $query->andFilterWhere(['ilike', 'titulo', $buscarForm->titulo]);
-            $query->andFilterWhere(['genero_id' => $buscarForm->genero_id]);
-        }
-
-        if (empty($sort->orders)) {
-            $query->orderBy(['id' => SORT_ASC]);
-        } else {
-            $query->orderBy($sort->orders);
-        }
+        $searchModel = new PeliculasSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->get());
 
         return $this->render('index', [
-            'peliculas' => $query->all(),
-            'sort' => $sort,
-            'listaGeneros' => ['' => ''] + $this->listaGeneros(),
-            'buscarForm' => $buscarForm,
+            'dataProvider' => $dataProvider,
+            'searchModel' => $searchModel,
         ]);
     }
 
@@ -58,12 +80,22 @@ class PeliculasController extends \yii\web\Controller
     {
         $pelicula = new Peliculas();
 
+        if (Yii::$app->request->isAjax && $pelicula->load(Yii::$app->request->post())) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            return ActiveForm::validate($pelicula);
+        }
+
         if ($pelicula->load(Yii::$app->request->post()) && $pelicula->save()) {
             return $this->redirect(['peliculas/index']);
         }
         return $this->render('create', [
             'pelicula' => $pelicula,
         ]);
+    }
+
+    public function actionView($id)
+    {
+        return $this->actionVer($id);
     }
 
     public function actionVer($id)
