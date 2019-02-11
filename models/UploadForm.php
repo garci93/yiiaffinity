@@ -23,7 +23,11 @@ class UploadForm extends Model
     public function upload()
     {
         if ($this->validate()) {
-            $this->imageFile->saveAs(Yii::getAlias('@uploads/' . $this->imageFile->baseName . '.' . $this->imageFile->extension));
+            $fileName = Yii::getAlias('@uploads/' . $this->imageFile->baseName . '.' . $this->imageFile->extension);
+            $this->imageFile->saveAs($fileName);
+            $imagine = new \Imagine\Gd\Imagine();
+            $image = $imagine->open($fileName);
+            $image->resize(new \Imagine\Image\Box(400, 200))->save($fileName);
             return true;
         }
         return false;
